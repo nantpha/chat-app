@@ -1,0 +1,138 @@
+.message-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  margin: auto;
+}
+
+.message {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.avatar {
+  margin-right: 10px;
+}
+
+.avatar-img {
+  width: 30px; /* Adjust size as needed */
+  height: auto;
+  border-radius: 50%; /* Makes the image round */
+}
+
+.message-text {
+  background-color: #f2f2f2;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+}
+
+.ai-message {
+  align-self: flex-start;
+}
+
+.user-message {
+  align-self: flex-end;
+}
+
+.input-container {
+  margin-top: 20px;
+}
+
+input[type="text"] {
+  width: calc(100% - 70px);
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+/* :host {
+  background-image: url('assets/backgound.png');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+} */
+
+
+.message-container {
+  background-image: url('assets/backgound.png'); /* Replace with your image path */
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed; /* Keeps the background fixed while scrolling content */
+  height: 100vh; /* Cover the full viewport height */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  flex-direction: column; /* Stack items vertically */
+  overflow: hidden; 
+}
+
+.messages {
+  max-width: 80%; /* Adjust as needed */
+  overflow-y: auto; /* Enable scroll if messages exceed container height */
+  margin-bottom: 20px; /* Space between messages and input */
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.avatar-img {
+  width: 30px; /* Adjust size as needed */
+  height: 30px; /* Match the text size */
+  border-radius: 50%; /* Makes the image round */
+  margin-right: 10px; /* Space between avatar and message */
+}
+
+.message-text {
+  background-color: #f2f2f2;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+}
+
+input[type="text"] {
+  flex: 1; /* Take remaining space */
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}

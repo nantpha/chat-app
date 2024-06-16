@@ -1,0 +1,82 @@
+<!-- <div class="chat-container">
+  <div class="ai-robot-container">
+    <img [src]="aiRobotImage" alt="AI Robot" class="ai-robot">
+  </div>
+  <div class="chat-box">
+    <div class="messages" #chatContainer>
+      <div *ngFor="let message of messages" class="message" [ngClass]="{'ai-message': message.sender === 'AI', 'user-message': message.sender === 'User'}">
+        {{ message.text }}
+      </div>
+    </div>
+    <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." class="message-input" (keydown.enter)="sendMessage()">
+  </div>
+  <div class="user-container">
+    <img [src]="userImage" alt="User" class="user">
+  </div>
+</div> -->
+
+<!-- <div class="message-container">
+  <div class="messages">
+    <div *ngFor="let message of messages" class="message" [ngClass]="{'ai-message': message.sender === 'AI', 'user-message': message.sender === 'User'}">
+      <div *ngIf="message.sender === 'AI'" class="avatar">
+        <img src="{{ aiRobotImage }}" alt="AI Robot" class="avatar-img">
+      </div>
+      <div class="message-text">
+        {{ message.text }}
+      </div>
+    </div>
+  </div>
+  <div class="input-container">
+    <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." (keydown.enter)="sendMessage()">
+    <button (click)="sendMessage()">Send</button>
+  </div>
+</div> -->
+
+<!-- <div class="message-container">
+  <div class="messages">
+    <div *ngFor="let message of messages" class="message" [ngClass]="{'ai-message': message.sender === 'AI', 'user-message': message.sender === 'User'}">
+      <div *ngIf="message.sender === 'AI'" class="avatar">
+        <img [src]="aiRobotImage" alt="AI Robot" class="avatar-img">
+      </div>
+      <div *ngIf="message.sender === 'User'" class="avatar">
+        <img [src]="userImage" alt="User" class="avatar-img">
+      </div>
+      <div class="message-text">
+        {{ message.text }}
+      </div>
+    </div>
+  </div>
+  <div class="input-container">
+    <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." (keydown.enter)="sendMessage()">
+    <button (click)="sendMessage()">Send</button>
+  </div>
+</div> -->
+<div class="container" style="background-image: url('assets/backgound.png'); background-size: cover; background-position: center;  display: flex;
+justify-content: center;
+align-items: center; 
+flex-direction: column">
+  <!-- Your component content goes here -->
+
+
+<div class="message-container">
+  <div class="messages">
+    <div *ngFor="let message of messages" class="message">
+      <div *ngIf="message.sender === 'AI'" class="avatar">
+        <img [src]="aiRobotImage" alt="AI Robot" class="avatar-img">
+      </div>
+      <div *ngIf="message.sender === 'User'" class="avatar">
+        <img [src]="userImage" alt="User" class="avatar-img">
+      </div>
+      <div class="message-text">
+        {{ message.text }}
+      </div>
+    </div>
+  </div>
+  <div class="input-container">
+    <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." (keydown.enter)="sendMessage()">
+    <button (click)="sendMessage()">Send</button>
+  </div>
+</div>
+
+</div>
+
