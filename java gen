@@ -1,0 +1,123 @@
+import os
+import streamlit as st
+import ast
+import re
+import nest_asyncio
+from llama_index.llms.openai import OpenAI
+from llama_index.llms.anthropic import Anthropic
+from llama_index.llms.mistralai import MistralAI
+from llama_index.core.llms import ChatMessage
+
+nest_asyncio.apply()
+
+key = os.getenv('MISTRAL_API_KEY')
+os.environ["MISTRAL_API_KEY"] = key
+
+st.title("Auto Test Case Generation using ILM")
+
+uploaded_python_files = st.file_uploader("Upload Python (.py) files", type="py", accept_multiple_files=True)
+uploaded_java_files = st.file_uploader("Upload Java (.java) files", type="java", accept_multiple_files=True)
+
+def extract_functions_from_python(file_content):
+    functions = {}
+    parsed_content = ast.parse(file_content)
+    for node in ast.walk(parsed_content):
+        if isinstance(node, ast.FunctionDef):
+            func_name = node.name
+            func_body = ast.get_source_segment(file_content, node)
+            functions[func_name] = func_body
+    return functions
+
+def extract_classes_and_methods_from_java(file_content):
+    classes = {}
+    class_pattern = re.compile(r'class\s+(\w+)\s*{')
+    method_pattern = re.compile(r'(public|private|protected)\s+\w+\s+(\w+)\s*\(([^)]*)\)\s*{')
+    
+    class_matches = class_pattern.findall(file_content)
+    for class_match in class_matches:
+        class_name = class_match
+        classes[class_name] = {}
+        methods = method_pattern.findall(file_content)
+        for method in methods:
+            method_name = method[1]
+            method_signature = f"{method[0]} {method_name}({method[2]})"
+            classes[class_name][method_name] = method_signature
+    return classes
+
+def res(prompt, model=None):
+    response = [
+        ChatMessage(role="system", content="You are a sincere and helpful coding assistant"),
+        ChatMessage(role="user", content=prompt),
+    ]
+    resp = MistralAI(model).chat(response)
+    return resp
+
+def generate_test_cases(language, entity_name, entity_body):
+    prompt = f"""
+    Your task is to generate unit test cases for this {language} {entity_name}:
+
+    {entity_body}
+
+    Explain the {language} entity in a few lines.
+    Generate between 3 to 8 unique unit test cases, including a couple of edge cases.
+    All test cases should have mandatory assert statements.
+    Every test case should be defined as a method inside a test class.
+    All test cases should have textual descriptions for clarity.
+    Avoid generating repeated statements.
+    Recheck your response before generating.
+    Do not share the last test case.
+    """
+    response = res(prompt)
+    return response
+
+if uploaded_python_files:
+    for uploaded_file in uploaded_python_files:
+        file_content = uploaded_file.getvalue().decode("utf-8")
+        functions = extract_functions_from_python(file_content)
+        list_of_functions = list(functions.keys())
+        st.write(list_of_functions)
+        
+        if 'func' in st.session_state:
+            func = st.session_state['func']
+            if func in functions:
+                snippet = functions[func]
+                python_test_cases = generate_test_cases("Python", "function", snippet)
+                st.session_state.messages.append({"role": "assistant", "content": f"Generating test cases for {func}"})
+                st.markdown(python_test_cases)
+
+if uploaded_java_files:
+    for uploaded_file in uploaded_java_files:
+        file_content = uploaded_file.getvalue().decode("utf-8")
+        classes = extract_classes_and_methods_from_java(file_content)
+        list_of_classes = list(classes.keys())
+        st.write(list_of_classes)
+        
+        if 'class_name' in st.session_state and 'method_name' in st.session_state:
+            class_name = st.session_state['class_name']
+            method_name = st.session_state['method_name']
+            if class_name in classes and method_name in classes[class_name]:
+                method_signature = classes[class_name][method_name]
+                java_test_cases = generate_test_cases("Java", "method", method_signature)
+                st.session_state.messages.append({"role": "assistant", "content": f"Generating test cases for {class_name}.{method_name}"})
+                st.markdown(java_test_cases)
+
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+func = st.chat_input("Enter the function name for generating test cases (for Python):")
+if func:
+    st.session_state['func'] = func
+    st.session_state.messages.append({"role": "assistant", "content": f"Generating test cases for {func}"})
+    st.experimental_rerun()
+
+class_name = st.chat_input("Enter the class name for generating test cases (for Java):")
+method_name = st.chat_input("Enter the method name for generating test cases (for Java):")
+if class_name and method_name:
+    st.session_state['class_name'] = class_name
+    st.session_state['method_name'] = method_name
+    st.session_state.messages.append({"role": "assistant", "content": f"Generating test cases for {class_name}.{method_name}"})
+    st.experimental_rerun()
