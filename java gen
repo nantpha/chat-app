@@ -3,15 +3,10 @@ import streamlit as st
 import ast
 import re
 import nest_asyncio
-from llama_index.llms.openai import OpenAI
-from llama_index.llms.anthropic import Anthropic
 from llama_index.llms.mistralai import MistralAI
 from llama_index.core.llms import ChatMessage
 
 nest_asyncio.apply()
-
-key = os.getenv('MISTRAL_API_KEY')
-os.environ["MISTRAL_API_KEY"] = key
 
 st.title("Auto Test Case Generation using ILM")
 
@@ -30,28 +25,36 @@ def extract_functions_from_python(file_content):
 def extract_classes_and_methods_from_java(file_content):
     classes = {}
     class_pattern = re.compile(r'class\s+(\w+)\s*{')
-    method_pattern = re.compile(r'(public|private|protected)\s+\w+\s+(\w+)\s*\(([^)]*)\)\s*{')
+    method_pattern = re.compile(r'(public|private|protected)\s+\w+\s+(\w+)\s*\([^)]*\)\s*{')
     
     class_matches = class_pattern.findall(file_content)
-    for class_match in class_matches:
-        class_name = class_match
-        classes[class_name] = {}
-        methods = method_pattern.findall(file_content)
-        for method in methods:
-            method_name = method[1]
-            method_signature = f"{method[0]} {method_name}({method[2]})"
-            classes[class_name][method_name] = method_signature
+    if class_matches:
+        for class_match in class_matches:
+            class_name = class_match
+            classes[class_name] = {}
+            methods = method_pattern.findall(file_content)
+            for method in methods:
+                method_name = method[1]
+                method_body = extract_method_body(file_content, method_name)
+                classes[class_name][method_name] = method_body
     return classes
 
-def res(prompt, model=None):
+def extract_method_body(file_content, method_name):
+    method_pattern = re.compile(r'(public|private|protected)\s+\w+\s+(' + re.escape(method_name) + r')\s*\([^)]*\)\s*{([^{}]*(?:{[^{}]*})*[^{}]*)}')
+    match = method_pattern.search(file_content)
+    if match:
+        return match.group(0)
+    return ""
+
+def res(prompt, model):
     response = [
         ChatMessage(role="system", content="You are a sincere and helpful coding assistant"),
         ChatMessage(role="user", content=prompt),
     ]
-    resp = MistralAI(model).chat(response)
+    resp = model.chat(response)
     return resp
 
-def generate_test_cases(language, entity_name, entity_body):
+def generate_test_cases(language, entity_name, entity_body, model):
     prompt = f"""
     Your task is to generate unit test cases for this {language} {entity_name}:
 
@@ -65,9 +68,28 @@ def generate_test_cases(language, entity_name, entity_body):
     Avoid generating repeated statements.
     Recheck your response before generating.
     Do not share the last test case.
+
+    Post Prompt: Please ensure the test cases are comprehensive and cover edge cases. Add Jira-compatible comments with descriptions for each test case.
     """
-    response = res(prompt)
-    return response
+    response = res(prompt, model)
+    post_prompt = f"""Except the last test case, display everything that is present in this end to end: \n\n {response}\
+
+\n\n Do not add anything extra, Just copy and paste everything except the last test case，
+
+\n\n Do not mention the count of total number of test cases in the response nor mention "I have excluded the last test case as per your request"""
+    final_response = res(post_prompt, model)
+    return final_response
+
+def save_test_cases(file_name, test_cases):
+    base_name, ext = os.path.splitext(file_name)
+    test_file_name = f"{base_name}_test{ext}"
+    with open(test_file_name, "w") as test_file:
+        test_file.write(test_cases)
+    return test_file_name
+
+# Initialize session state if not already done
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
 
 if uploaded_files:
     for uploaded_file in uploaded_files:
@@ -82,12 +104,21 @@ if uploaded_files:
             func = st.selectbox(f"Select a function from {file_name} to generate test cases", list_of_functions)
             if func:
                 snippet = functions[func]
-                python_test_cases = generate_test_cases("Python", "function", snippet)
+                model = MistralAI("codestral-latest")
+                python_test_cases = generate_test_cases("Python", "function", snippet, model)
                 st.session_state.messages.append({"role": "assistant", "content": f"Generating test cases for {func}"})
-                st.markdown(python_test_cases)
+                st.session_state.messages.append({"role": "assistant", "content": python_test_cases})
+                
+                # Save test cases to a file
+                test_file_name = save_test_cases(file_name, python_test_cases)
+                st.write(f"Test cases saved to {test_file_name}")
         
         elif file_name.endswith('.java'):
             classes = extract_classes_and_methods_from_java(file_content)
+            if not classes:
+                st.write(f"No classes or methods found in {file_name}.")
+                continue
+            
             list_of_classes = list(classes.keys())
             st.write(f"Classes in {file_name}: {list_of_classes}")
             
@@ -97,14 +128,32 @@ if uploaded_files:
                 list_of_methods = list(methods.keys())
                 method_name = st.selectbox(f"Select a method from {class_name} to generate test cases", list_of_methods)
                 if method_name:
-                    method_signature = methods[method_name]
-                    java_test_cases = generate_test_cases("Java", "method", method_signature)
+                    method_body = methods[method_name]
+                    model = MistralAI("codestral-latest")
+                    java_test_cases = generate_test_cases("Java", "method", method_body, model)
                     st.session_state.messages.append({"role": "assistant", "content": f"Generating test cases for {class_name}.{method_name}"})
-                    st.markdown(java_test_cases)
+                    st.session_state.messages.append({"role": "assistant", "content": java_test_cases})
+                    
+                    # Save test cases to a file
+                    test_file_name = save_test_cases(file_name, java_test_cases)
+                    st.write(f"Test cases saved to {test_file_name}")
 
-if 'messages' not in st.session_state:
-    st.session_state.messages = []
-
+# Display all chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
+
+# Inputs for user interaction
+func = st.chat_input("Enter the function name for generating test cases (for Python):")
+if func:
+    st.session_state['func'] = func
+    st.session_state.messages.append({"role": "user", "content": func})
+    st.experimental_rerun()
+
+class_name = st.chat_input("Enter the class name for generating test cases (for Java):")
+method_name = st.chat_input("Enter the method name for generating test cases (for Java):")
+if class_name and method_name:
+    st.session_state['class_name'] = class_name
+    st.session_state['method_name'] = method_name
+    st.session_state.messages.append({"role": "user", "content": f"{class_name}.{method_name}"})
+    st.experimental_rerun()
