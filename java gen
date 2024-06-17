@@ -15,8 +15,7 @@ os.environ["MISTRAL_API_KEY"] = key
 
 st.title("Auto Test Case Generation using ILM")
 
-uploaded_python_files = st.file_uploader("Upload Python (.py) files", type="py", accept_multiple_files=True)
-uploaded_java_files = st.file_uploader("Upload Java (.java) files", type="java", accept_multiple_files=True)
+uploaded_files = st.file_uploader("Upload Python (.py) or Java (.java) files", type=["py", "java"], accept_multiple_files=True)
 
 def extract_functions_from_python(file_content):
     functions = {}
@@ -70,36 +69,38 @@ def generate_test_cases(language, entity_name, entity_body):
     response = res(prompt)
     return response
 
-if uploaded_python_files:
-    for uploaded_file in uploaded_python_files:
+if uploaded_files:
+    for uploaded_file in uploaded_files:
         file_content = uploaded_file.getvalue().decode("utf-8")
-        functions = extract_functions_from_python(file_content)
-        list_of_functions = list(functions.keys())
-        st.write(list_of_functions)
+        file_name = uploaded_file.name
         
-        if 'func' in st.session_state:
-            func = st.session_state['func']
-            if func in functions:
+        if file_name.endswith('.py'):
+            functions = extract_functions_from_python(file_content)
+            list_of_functions = list(functions.keys())
+            st.write(f"Functions in {file_name}: {list_of_functions}")
+            
+            func = st.selectbox(f"Select a function from {file_name} to generate test cases", list_of_functions)
+            if func:
                 snippet = functions[func]
                 python_test_cases = generate_test_cases("Python", "function", snippet)
                 st.session_state.messages.append({"role": "assistant", "content": f"Generating test cases for {func}"})
                 st.markdown(python_test_cases)
-
-if uploaded_java_files:
-    for uploaded_file in uploaded_java_files:
-        file_content = uploaded_file.getvalue().decode("utf-8")
-        classes = extract_classes_and_methods_from_java(file_content)
-        list_of_classes = list(classes.keys())
-        st.write(list_of_classes)
         
-        if 'class_name' in st.session_state and 'method_name' in st.session_state:
-            class_name = st.session_state['class_name']
-            method_name = st.session_state['method_name']
-            if class_name in classes and method_name in classes[class_name]:
-                method_signature = classes[class_name][method_name]
-                java_test_cases = generate_test_cases("Java", "method", method_signature)
-                st.session_state.messages.append({"role": "assistant", "content": f"Generating test cases for {class_name}.{method_name}"})
-                st.markdown(java_test_cases)
+        elif file_name.endswith('.java'):
+            classes = extract_classes_and_methods_from_java(file_content)
+            list_of_classes = list(classes.keys())
+            st.write(f"Classes in {file_name}: {list_of_classes}")
+            
+            class_name = st.selectbox(f"Select a class from {file_name} to generate test cases", list_of_classes)
+            if class_name:
+                methods = classes[class_name]
+                list_of_methods = list(methods.keys())
+                method_name = st.selectbox(f"Select a method from {class_name} to generate test cases", list_of_methods)
+                if method_name:
+                    method_signature = methods[method_name]
+                    java_test_cases = generate_test_cases("Java", "method", method_signature)
+                    st.session_state.messages.append({"role": "assistant", "content": f"Generating test cases for {class_name}.{method_name}"})
+                    st.markdown(java_test_cases)
 
 if 'messages' not in st.session_state:
     st.session_state.messages = []
@@ -107,17 +108,3 @@ if 'messages' not in st.session_state:
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-
-func = st.chat_input("Enter the function name for generating test cases (for Python):")
-if func:
-    st.session_state['func'] = func
-    st.session_state.messages.append({"role": "assistant", "content": f"Generating test cases for {func}"})
-    st.experimental_rerun()
-
-class_name = st.chat_input("Enter the class name for generating test cases (for Java):")
-method_name = st.chat_input("Enter the method name for generating test cases (for Java):")
-if class_name and method_name:
-    st.session_state['class_name'] = class_name
-    st.session_state['method_name'] = method_name
-    st.session_state.messages.append({"role": "assistant", "content": f"Generating test cases for {class_name}.{method_name}"})
-    st.experimental_rerun()
