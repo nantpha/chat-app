@@ -1,40 +1,63 @@
-import React, { useState } from 'react';
-import FileUpload from './components/FileUpload';
-import ResultsDisplay from './components/ResultsDisplay';
-import ProcessButton from './components/ProcessButton';
-import FinalResult from './components/FinalResult';
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+}
 
-const App = () => {
-  const [file, setFile] = useState(null);
-  const [results, setResults] = useState([]);
-  const [selectedResult, setSelectedResult] = useState(null);
-  const [finalResult, setFinalResult] = useState('');
+.upload-container {
+  margin-bottom: 20px;
+}
 
-  const handleFileUpload = (file) => {
-    setFile(file);
-    // Here you would normally process the file and set the results
-    setResults(['Result 1', 'Result 2', 'Result 3']); // Dummy results
-  };
+.result-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 20px;
+}
 
-  const handleSelectResult = (result) => {
-    setSelectedResult(result);
-  };
+.result-box {
+  width: 300px;
+  height: 300px;
+  border: 1px solid #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 20px;
+  overflow: auto;
+}
 
-  const handleProcess = () => {
-    // Process the selected result and set the final result
-    setFinalResult(selectedResult);
-  };
+.button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
 
-  return (
-    <div>
-      <FileUpload onFileUpload={handleFileUpload} />
-      <div>
-        <ResultsDisplay results={results} onSelectResult={handleSelectResult} />
-        <ProcessButton onClick={handleProcess} />
-        <FinalResult result={finalResult} />
-      </div>
-    </div>
-  );
-};
+button {
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+}
 
-export default App;
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  cursor: pointer;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+li:hover {
+  background-color: #f0f0f0;
+}
+
+.copied-message {
+  color: green;
+  margin-top: 10px;
+}
