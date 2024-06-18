@@ -1,3 +1,49 @@
+import React, { useState } from 'react';
+import { FileUpload, ResultsDisplay, ProcessButton, FinalResult } from './components';
+import './App.css';
+
+const App = () => {
+  const [file, setFile] = useState(null);
+  const [results, setResults] = useState([]);
+  const [selectedResult, setSelectedResult] = useState(null);
+  const [finalResult, setFinalResult] = useState('');
+
+  const handleFileUpload = (file) => {
+    setFile(file);
+    // Simulate file processing and setting results
+    setResults(['Result 1', 'Result 2', 'Result 3']); // Dummy results
+  };
+
+  const handleSelectResult = (result) => {
+    setSelectedResult(result);
+  };
+
+  const handleProcess = () => {
+    // Process the selected result and set the final result
+    setFinalResult(selectedResult);
+  };
+
+  return (
+    <div className="App">
+      <div className="upload-container">
+        <FileUpload onFileUpload={handleFileUpload} />
+      </div>
+      <div className="result-container">
+        <div className="result-box">
+          <ResultsDisplay results={results} onSelectResult={handleSelectResult} />
+        </div>
+        <div className="button-container">
+          <ProcessButton onClick={handleProcess} />
+        </div>
+        <div className="result-box">
+          <FinalResult result={finalResult} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
 .App {
   text-align: center;
   display: flex;
