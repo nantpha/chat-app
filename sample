@@ -1,4 +1,234 @@
 
+To integrate a company logo into the header and style it appropriately, you can follow these steps. Assuming you have a logo file and you want it displayed prominently in the header, here's how to do it:
+
+### 1. Add the Image File
+
+Ensure the logo image file is placed in the `public` folder or another accessible folder within your project. For this example, let's place it in the `public` folder:
+
+```
+public/
+├── logo.png
+├── index.html
+└── ...
+```
+
+### 2. Update `src/App.js`
+
+Update the structure of the `App.js` file to include the logo in the header.
+
+```jsx
+import React, { useState } from 'react';
+import { FileUpload, ResultsDisplay, ProcessButton, FinalResult } from './components';
+import './App.css';
+
+const App = () => {
+  const [file, setFile] = useState(null);
+  const [results, setResults] = useState([]);
+  const [selectedResult, setSelectedResult] = useState(null);
+  const [finalResult, setFinalResult] = useState('');
+
+  const handleFileUpload = (file) => {
+    setFile(file);
+    // Simulate file processing and setting results
+    setResults(['Result 1', 'Result 2', 'Result 3']); // Dummy results
+  };
+
+  const handleSelectResult = (result) => {
+    setSelectedResult(result);
+  };
+
+  const handleProcess = () => {
+    // Process the selected result and set the final result
+    setFinalResult(selectedResult);
+  };
+
+  return (
+    <div className="App">
+      <div className="container">
+        <div className="header">
+          <img src="/logo.png" alt="Company Logo" className="header-logo" />
+          <h1 className="header-title">Header</h1>
+        </div>
+        <div className="main-content">
+          <div className="sidebar"></div>
+          <div className="content">
+            <div className="upload-container">
+              <FileUpload onFileUpload={handleFileUpload} />
+            </div>
+            <div className="result-container">
+              <div className="result-box">
+                <ResultsDisplay results={results} onSelectResult={handleSelectResult} />
+              </div>
+              <div className="button-container">
+                <ProcessButton onClick={handleProcess} />
+              </div>
+              <div className="result-box">
+                <FinalResult result={finalResult} />
+              </div>
+            </div>
+          </div>
+          <div className="sidebar"></div>
+        </div>
+        <div className="footer">
+          <h1>Footer</h1>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+```
+
+### 3. Update `src/App.css`
+
+Update the CSS to style the header with the company logo and make the text bold.
+
+```css
+/* General styling for the application */
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+}
+
+/* Container for the header, content, and footer */
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* Header and footer styling */
+.header {
+  background-color: #0000ff; /* Blue color */
+  color: white;
+  padding: 10px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.header-logo {
+  height: 40px; /* Adjust size as needed */
+  margin-right: 10px;
+}
+
+.header-title {
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Footer styling */
+.footer {
+  background-color: #0000ff; /* Blue color */
+  color: white;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Main content area styling */
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Blue sidebars styling */
+.sidebar {
+  background-color: #0000ff; /* Blue color */
+  flex: 1;
+}
+
+.content {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.upload-container {
+  margin-bottom: 20px;
+}
+
+.result-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+
+.result-box {
+  width: 300px;
+  height: 300px;
+  border: 1px solid #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* Added for positioning child elements */
+  overflow: auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  cursor: pointer;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+li:hover {
+  background-color: #f0f0f0;
+}
+
+.copied-message {
+  color: green;
+  margin-top: 10px;
+}
+
+.copy-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+```
+
+With these changes, the header will include a company logo on the left and a bold header title. The header and footer will have a blue background color, and the text will be bold. Adjust the logo size and margins as necessary to fit your specific design needs.
+
+
+-----
 /* General styling for the application */
 .App {
   text-align: center;
