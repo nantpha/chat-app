@@ -1,3 +1,211 @@
+To set the background color of the header to blue and make the text bold, you need to adjust the CSS properties for the header. Here's how you can do it:
+
+### Update `src/App.css`
+
+Update the CSS to apply the blue background color and bold text for the header. 
+
+```css
+/* General styling for the application */
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+}
+
+/* Container for the header, content, and footer */
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* Header and footer styling */
+.header, .footer {
+  background-color: #0000ff; /* Blue color */
+  color: white;
+  padding: 10px;
+  text-align: center;
+  position: relative;
+  font-weight: bold; /* Make text bold */
+}
+
+/* Styling for the image in the header */
+.header-image {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  height: 40px; /* Adjust size as needed */
+}
+
+/* Main content area styling */
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Blue sidebars styling */
+.sidebar {
+  background-color: #0000ff; /* Blue color */
+  flex: 1;
+}
+
+.content {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.upload-container {
+  margin-bottom: 20px;
+}
+
+.result-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+
+.result-box {
+  width: 300px;
+  height: 300px;
+  border: 1px solid #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* Added for positioning child elements */
+  overflow: auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  cursor: pointer;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+li:hover {
+  background-color: #f0f0f0;
+}
+
+.copied-message {
+  color: green;
+  margin-top: 10px;
+}
+
+.copy-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+```
+
+### Update `src/App.js`
+
+Ensure the `App.js` remains the same with the correct structure for the header including the image.
+
+```jsx
+import React, { useState } from 'react';
+import { FileUpload, ResultsDisplay, ProcessButton, FinalResult } from './components';
+import './App.css';
+
+const App = () => {
+  const [file, setFile] = useState(null);
+  const [results, setResults] = useState([]);
+  const [selectedResult, setSelectedResult] = useState(null);
+  const [finalResult, setFinalResult] = useState('');
+
+  const handleFileUpload = (file) => {
+    setFile(file);
+    // Simulate file processing and setting results
+    setResults(['Result 1', 'Result 2', 'Result 3']); // Dummy results
+  };
+
+  const handleSelectResult = (result) => {
+    setSelectedResult(result);
+  };
+
+  const handleProcess = () => {
+    // Process the selected result and set the final result
+    setFinalResult(selectedResult);
+  };
+
+  return (
+    <div className="App">
+      <div className="container">
+        <div className="header">
+          <img src="/logo.png" alt="Logo" className="header-image" />
+          <h1>Header</h1>
+        </div>
+        <div className="main-content">
+          <div className="sidebar"></div>
+          <div className="content">
+            <div className="upload-container">
+              <FileUpload onFileUpload={handleFileUpload} />
+            </div>
+            <div className="result-container">
+              <div className="result-box">
+                <ResultsDisplay results={results} onSelectResult={handleSelectResult} />
+              </div>
+              <div className="button-container">
+                <ProcessButton onClick={handleProcess} />
+              </div>
+              <div className="result-box">
+                <FinalResult result={finalResult} />
+              </div>
+            </div>
+          </div>
+          <div className="sidebar"></div>
+        </div>
+        <div className="footer">
+          <h1>Footer</h1>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+```
+
+With these changes, the header and footer will have a blue background color, and the text within them will be bold. The image in the header will be positioned at the top left, and you can adjust the size as needed with the CSS properties. Make sure the image path (`/logo.png`) matches the location of your image file in the `public` folder.
+
+
+&₹₹₹₹
+
+
 To add a header and footer with blue color on the left and right sides while keeping the main content area white, you can structure your HTML and CSS accordingly. Here is an updated version of your project that includes a header, footer, and the specified color scheme.
 
 ### src/App.css
