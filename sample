@@ -1,3 +1,125 @@
+
+
+To apply a dark theme background similar to the IntelliJ dark theme and move the `FinalResult` div to the left side with nice borders, you can define and use custom CSS styles. Here's how you can do it:
+
+### Step 1: Define the CSS Styles
+
+Add the following CSS rules to your `App.css` file to style the `FinalResult` component:
+
+```css
+/* Dark theme background and styling for FinalResult */
+.final-result {
+  background-color: #2b2b2b; /* IntelliJ dark theme background color */
+  color: #a9b7c6; /* IntelliJ text color */
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #3c3f41; /* Dark border */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Optional: Add some shadow for depth */
+  margin-top: 20px;
+}
+
+/* Move FinalResult to the left side */
+.result-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.result-container .final-result {
+  margin-left: auto; /* Align FinalResult to the left */
+  margin-right: 20px; /* Add some spacing from the right side */
+}
+```
+
+### Step 2: Apply the CSS Class to the `FinalResult` Component
+
+Modify the `FinalResult` component and its usage in `App.js` to apply the CSS class:
+
+**FinalResult.js:**
+
+```jsx
+// components/FinalResult.js
+import React from 'react';
+import './FinalResult.css'; // Import the CSS file for FinalResult styles
+
+const FinalResult = ({ result }) => {
+  return (
+    <div className="final-result">
+      <h2>Final Result:</h2>
+      <p>{result}</p>
+    </div>
+  );
+};
+
+export default FinalResult;
+```
+
+**App.js:**
+
+```jsx
+import React, { useState } from 'react';
+import './App.css';
+import FileUpload from './components/FileUpload';
+import ResultsDisplay from './components/ResultsDisplay';
+import ProcessButton from './components/ProcessButton';
+import FinalResult from './components/FinalResult';
+
+const App = () => {
+  const [file, setFile] = useState(null);
+  const [results, setResults] = useState([]);
+  const [selectedResult, setSelectedResult] = useState(null);
+  const [finalResult, setFinalResult] = useState('');
+
+  const handleFileUpload = (file) => {
+    setFile(file);
+    // Simulate file processing and setting results
+    setResults(['Result 1', 'Result 2', 'Result 3']); // Dummy results
+  };
+
+  const handleSelectResult = (result) => {
+    setSelectedResult(result);
+  };
+
+  const handleProcess = () => {
+    // Process the selected result and set the final result
+    setFinalResult(selectedResult);
+  };
+
+  return (
+    <div className="App">
+      <div className="upload-container">
+        <FileUpload onFileUpload={handleFileUpload} />
+      </div>
+      <div className="result-container">
+        <div className="result-box">
+          <ResultsDisplay results={results} onSelectResult={handleSelectResult} />
+        </div>
+        <div className="button-container">
+          <ProcessButton onClick={handleProcess} />
+        </div>
+        <div className="result-box final-result">
+          <FinalResult result={finalResult} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+```
+
+### Notes:
+
+1. **CSS Specificity**: Ensure that your CSS selectors are specific enough to apply the desired styles.
+2. **CSS File Imports**: If you have multiple CSS files, make sure they are imported correctly to avoid conflicts.
+3. **Styling Flexibility**: Adjust the margins, paddings, colors, and other properties as needed to fit your design preferences.
+
+By following these steps, you can apply a dark theme background and move the `FinalResult` component to the left side with nice borders, achieving the desired IntelliJ dark theme look and improved layout.
+
+
+
+
+
 You can phrase it like this:
 
 "To ensure the input speed matches the output speed, we planned and executed the above project."
