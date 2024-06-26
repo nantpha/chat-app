@@ -6,7 +6,287 @@ This sentence clearly communicates the reason for the project and the actions ta
 
 "To ensure that the input speed equals the output speed, we planned and executed the above project. This included implementing logic for a Kafka consumer application, designing the application architecture, and coordinating with the team to achieve our goals."
 
+To achieve a final result display on the right side with a theme similar to the IntelliJ Dark theme, you can update your CSS to give it a dark, modern look. Here's how you can enhance your existing setup:
 
+### Step 1: Create the Dark Theme Styles
+
+#### `App.css`
+
+Update your `App.css` to include dark theme styles:
+
+```css
+.app {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #2b2b2b;
+    color: #a9b7c6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.header-text {
+    text-align: left;
+    color: #a9b7c6;
+    font-size: 24px;
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.left-side, .right-side {
+    flex: 1;
+    text-align: left;
+    padding: 20px;
+    background-color: #3c3f41;
+    border-radius: 5px;
+    margin: 0 10px;
+}
+
+.upload-container {
+    margin-bottom: 20px;
+}
+
+.dropdown-container {
+    margin-top: 10px;
+}
+
+.dropdown-select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #555555;
+    border-radius: 5px;
+    background-color: #3c3f41;
+    color: #a9b7c6;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+}
+
+.dropdown-select:focus {
+    outline: none;
+    border-color: #777777;
+}
+
+.right-side h3 {
+    color: #a9b7c6;
+}
+
+.right-side p {
+    color: #a9b7c6;
+}
+```
+
+### Step 2: Update Components to Use New Styles
+
+Ensure your components are using the updated styles.
+
+#### `Dropdown.js`
+
+```jsx
+import React from 'react';
+import './Dropdown.css'; // Make sure this path is correct based on your project structure
+
+const Dropdown = ({ options, selectedOption, onChange }) => {
+    return (
+        <div className="dropdown-container">
+            <select value={selectedOption} onChange={(e) => onChange(e.target.value)} className="dropdown-select">
+                <option value="" disabled>Please select...</option>
+                {options.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+            </select>
+        </div>
+    );
+}
+
+export default Dropdown;
+```
+
+#### `Header.js`
+
+Ensure your header component is styled correctly:
+
+```jsx
+import React from 'react';
+import './Header.css'; // Make sure this path is correct based on your project structure
+
+const Header = () => {
+    return (
+        <div className="header">
+            <div className="header-text">Left Text</div>
+            <img src="logo.png" alt="Logo" className="header-logo" />
+            <div className="header-text">Center Text</div>
+        </div>
+    );
+}
+
+export default Header;
+```
+
+#### `Upload.js`
+
+Ensure your upload component is styled correctly:
+
+```jsx
+import React from 'react';
+import './Upload.css'; // Make sure this path is correct based on your project structure
+
+const Upload = ({ onFileUpload }) => {
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        onFileUpload(file);
+    };
+
+    return (
+        <div className="upload-container">
+            <input type="file" onChange={handleFileChange} accept=".txt,.csv,.pdf" className="upload-input" />
+        </div>
+    );
+}
+
+export default Upload;
+```
+
+### Step 3: Ensure CSS for All Components
+
+#### `Upload.css`
+
+```css
+.upload-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #555555;
+    border-radius: 5px;
+    background-color: #3c3f41;
+    color: #a9b7c6;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+}
+
+.upload-input:focus {
+    outline: none;
+    border-color: #777777;
+}
+```
+
+#### `Header.css`
+
+```css
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    background-color: #3c3f41;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.header-text {
+    color: #a9b7c6;
+    font-size: 24px;
+}
+
+.header-logo {
+    height: 40px;
+}
+```
+
+### Step 4: Final Integration and Testing
+
+Ensure `App.js` integrates all components correctly:
+
+#### `App.js`
+
+```jsx
+import React, { useState } from 'react';
+import './App.css'; // Import your CSS styles
+
+import Header from './components/Header';
+import Upload from './components/Upload';
+import Dropdown from './components/Dropdown';
+
+const App = () => {
+    const [fileContent, setFileContent] = useState('');
+    const [selectedOption, setSelectedOption] = useState('');
+    const [options, setOptions] = useState([]);
+
+    const handleFileUpload = (file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            setFileContent(content);
+            const optionsFromContent = processFileContent(content);
+            setOptions(optionsFromContent);
+            setSelectedOption('');
+        };
+        reader.readAsText(file);
+    };
+
+    const processFileContent = (content) => {
+        const extractedOptions = content.split('\n').map((line, index) => ({
+            label: `Option ${index + 1}`,
+            value: `option${index + 1}`
+        }));
+        return extractedOptions;
+    };
+
+    const handleDropdownChange = (value) => {
+        setSelectedOption(value);
+    };
+
+    return (
+        <div className="app">
+            <Header />
+            <div className="content">
+                <div className="left-side">
+                    <Upload onFileUpload={handleFileUpload} />
+                    {options.length > 0 && (
+                        <Dropdown
+                            options={options}
+                            selectedOption={selectedOption}
+                            onChange={handleDropdownChange}
+                        />
+                    )}
+                </div>
+                <div className="right-side">
+                    {selectedOption && (
+                        <div>
+                            <h3>Selected Option:</h3>
+                            <p>{selectedOption}</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default App;
+```
+
+With these updates, your application should have a dark theme similar to the IntelliJ Dark theme, with a dropdown menu and the selected option displayed on the right side. Adjust the styles as needed to better fit your design preferences.
 
 
 To implement the dropdown component as shown in the image within the context of the project described earlier, follow these steps:
